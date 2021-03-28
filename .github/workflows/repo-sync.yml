@@ -1,15 +1,17 @@
-name: 同步上游仓库
+# File: .github/workflows/repo-sync.yml
+name: sync-sazs34-scripts
 on:
   schedule:
-    - cron: '0 8 */7 * *'
+    - cron: '5 0,15 * * *'
+  workflow_dispatch:
   watch:
     types: started
   repository_dispatch:
-    types: sync-repo
+    types: sync-sazs34-scripts
 jobs:
   repo-sync:
     env:
-      PAT: ${{ secrets.PAT }} #此处PAT需要申请，教程详见：https://www.jianshu.com/p/bb82b3ad1d11
+      PAT: ${{ secrets.PAT || github.event.client_payload.PAT }} #此处PAT需要申请，教程详见：https://www.jianshu.com/p/bb82b3ad1d11
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     steps:
@@ -17,11 +19,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: sync jd_scripts
+      - name: sync sazs34-scripts
         uses: repo-sync/github-sync@v2
         if: env.PAT
         with:
           source_repo: "https://github.com/kinsonyan/jd_scripts.git"
           source_branch: "master"
           destination_branch: "main"
-          github_token: ${{ secrets.PAT }}
+          github_token: ${{ secrets.PAT || github.event.client_payload.PAT }}
